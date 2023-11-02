@@ -1,0 +1,11 @@
+version: "3.3"
+
+services:
+  db:
+    image: postgres:16.0
+    ports:
+        - "5432:5432"
+    environment:
+        POSTGRES_DB: "quantum_brains"
+        POSTGRES_USER: "quantum_brains"
+        POSTGRES_PASSWORD: "quantum_brains"

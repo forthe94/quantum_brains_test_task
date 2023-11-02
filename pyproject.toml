@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "quantum-brains"
+version = "0.1.0"
+description = ""
+authors = ["Tetenkov Alexander <forthe@ya.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+sqlalchemy = "^2.0.22"
+alembic = "^1.12.1"
+isort = "^5.12.0"
+asyncpg = "^0.28.0"
+setuptools = "^68.2.2"
+python-dotenv = "^1.0.0"
+black = "^23.10.1"
+aiogram = "2.21"
+loguru = "^0.7.2"
+pytest = "^7.4.3"
+pytest-asyncio = "^0.21.1"
+mypy = "^1.6.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+python_version = "3.10"
+strict = true  # https://github.com/python/mypy/issues/11401
+ignore_missing_imports = true
+show_error_codes = true
+allow_untyped_decorators = true
+disallow_subclassing_any = false
+implicit_reexport = true
+exclude = ["venv", ".cache", "test_[a-z_]*.py", "conftest.py", "migrations", "fixtures.py"]
