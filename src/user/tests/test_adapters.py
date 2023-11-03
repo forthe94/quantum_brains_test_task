@@ -1,5 +1,6 @@
 import json
 import uuid
+from collections import defaultdict
 
 import pytest
 import sqlalchemy as sa
@@ -13,9 +14,11 @@ pytestmark = pytest.mark.asyncio
 
 
 async def test_create_user(
-        clear_db,
+    clear_db,
 ) -> None:
-    user = User(id=uuid.uuid4(), tg_id=1, balances={"BTC": 1.0, "ETH": 3.0})
+    user = User(
+        id=uuid.uuid4(), tg_id=1, balances=defaultdict(float, {"BTC": 1.0, "ETH": 3.0})
+    )
 
     user_repo = UserRepository()
 
@@ -26,5 +29,5 @@ async def test_create_user(
         result = (await session.execute(sa.select(UserORM))).scalars().first()
 
     balances = json.loads(result.balances)
-    assert balances['BTC'] == 1.0
-    assert balances['ETH'] == 3.0
+    assert balances["BTC"] == 1.0
+    assert balances["ETH"] == 3.0

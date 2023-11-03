@@ -20,6 +20,7 @@ pytest = "^7.4.3"
 pytest-asyncio = "^0.21.1"
 mypy = "^1.6.1"
 httpx = "^0.25.0"
+pytest-mock = "^3.12.0"
 
 
 [build-system]
@@ -34,4 +35,4 @@ show_error_codes = true
 allow_untyped_decorators = true
 disallow_subclassing_any = false
 implicit_reexport = true
-exclude = ["venv", ".cache", "test_[a-z_]*.py", "conftest.py", "migrations", "fixtures.py"]
+exclude = ["venv", ".cache", "test_[a-z_]*.py", "conftest.py", "migrations", "fixtures.py", "orm.py"]

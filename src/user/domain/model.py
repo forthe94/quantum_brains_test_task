@@ -1,14 +1,12 @@
 import dataclasses
 import uuid
+from collections import defaultdict
 
 
 @dataclasses.dataclass
 class User:
     tg_id: int
-    balances: dict[str, float]
-    id: uuid.UUID = uuid.uuid4()
-
-@dataclasses.dataclass
-class UserAccount:
-    user_id: uuid.UUID
+    balances: defaultdict[str, float] = dataclasses.field(
+        default_factory=lambda: defaultdict(float)
+    )
     id: uuid.UUID = uuid.uuid4()

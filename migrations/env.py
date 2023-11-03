@@ -29,6 +29,7 @@ if config.config_file_name is not None:
 target_metadata = METADATA
 
 from src.user.adapters import orm as user_orm
+from src.transaction.adapters import orm as transaction_orm
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

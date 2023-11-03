@@ -1,17 +1,26 @@
+import enum
+import json
 import uuid
+from typing import Any
+
 import sqlalchemy as sa
 import datetime as dt
 from contextvars import ContextVar
-from functools import wraps
+from functools import wraps, partial
 
 from loguru import logger
-from sqlalchemy.ext.asyncio import (AsyncSession, async_scoped_session,
-                                    async_sessionmaker, create_async_engine)
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+    async_scoped_session,
+    async_sessionmaker,
+    create_async_engine,
+)
 from sqlalchemy.orm import as_declarative
 
 from src import config
 
 METADATA = sa.MetaData()
+
 
 class GlobalScopeError(Exception):
     pass
@@ -68,10 +77,25 @@ class scoped_transaction:
 
 @as_declarative(metadata=METADATA)
 class AppORM:
-    created_at = sa.Column(sa.DateTime(timezone=True), nullable=False, default=dt.datetime.utcnow)
+    created_at = sa.Column(
+        sa.DateTime(timezone=True), nullable=False, default=dt.datetime.utcnow
+    )
     updated_at = sa.Column(
         sa.DateTime(timezone=True),
         nullable=False,
         default=dt.datetime.utcnow,
         onupdate=dt.datetime.utcnow,
     )
+
+
+def _default(obj: Any) -> Any:
+    """
+    Сериализация типов, которые не понимает json_dumps
+    """
+    if isinstance(obj, enum.Enum):
+        return obj.name
+    else:
+        return json.dumps(obj)
+
+
+json_dumps = partial(json.dumps, default=_default)
