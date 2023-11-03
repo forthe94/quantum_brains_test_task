@@ -68,7 +68,7 @@ class ExchangeService:
                 user = await self.user_repository.get(tg_id=tg_id, with_for_update=True)
 
                 buy_amount = amount * rate
-                if user.balances[from_currency.name] < buy_amount:
+                if user.balances[to_currency.name] < buy_amount:
                     raise InsufficientFundsError
 
                 received_amount = await self.exchange_api.buy(

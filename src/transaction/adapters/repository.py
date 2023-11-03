@@ -30,6 +30,6 @@ class TransactionRepository:
     async def update_status(
         self, transaction_id: uuid.UUID, status: enums.TransactionStatus
     ) -> None:
-        q = sa.update(TransactionORM).where(id=transaction_id).values(status=status)
+        q = sa.update(TransactionORM).where(TransactionORM.id==transaction_id).values(status=status)
 
         await self.session.execute(q)
