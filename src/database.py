@@ -1,20 +1,22 @@
 import uuid
+import sqlalchemy as sa
+import datetime as dt
 from contextvars import ContextVar
 from functools import wraps
 
 from loguru import logger
 from sqlalchemy.ext.asyncio import (AsyncSession, async_scoped_session,
                                     async_sessionmaker, create_async_engine)
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import as_declarative
 
 from src import config
 
+METADATA = sa.MetaData()
 
 class GlobalScopeError(Exception):
     pass
 
 
-DBMetadata = declarative_base()
 session_scope = ContextVar("session_scope", default="global")
 
 engine = create_async_engine(
@@ -62,3 +64,14 @@ class scoped_transaction:
         await self.session.close()
         await scoped_async_session.remove()
         session_scope.reset(self.token)
+
+
+@as_declarative(metadata=METADATA)
+class AppORM:
+    created_at = sa.Column(sa.DateTime(timezone=True), nullable=False, default=dt.datetime.utcnow)
+    updated_at = sa.Column(
+        sa.DateTime(timezone=True),
+        nullable=False,
+        default=dt.datetime.utcnow,
+        onupdate=dt.datetime.utcnow,
+    )

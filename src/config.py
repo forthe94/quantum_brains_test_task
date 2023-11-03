@@ -11,3 +11,5 @@ APP_DB_DSN = os.environ.get(
 )
 
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "fill_me")
+RATES_API_HOST = os.environ.get("RATES_API_HOST", "https://api.api-ninjas.com/v1/")
+RATES_API_KEY = os.environ.get("RATES_API_KEY", "fill_me")

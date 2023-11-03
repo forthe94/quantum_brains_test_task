@@ -1,15 +1,10 @@
-import asyncio
-import datetime
-import time
-import uuid
-from typing import Any, Callable
 
-import pytest
+
 import pytest_asyncio
-from src.database import DBMetadata, scoped_async_session, session_scope
+from src.database import METADATA, scoped_async_session
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def clear_db():
     """
     Clear DataBase after test. Use it in test with neste transactions
@@ -18,7 +13,7 @@ async def clear_db():
         yield
     finally:
         session = scoped_async_session()
-        for tbl in reversed(DBMetadata.metadata.sorted_tables):
+        for tbl in reversed(METADATA.sorted_tables):
             await session.execute(tbl.delete())
         await session.commit()
 
