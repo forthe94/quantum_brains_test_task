@@ -65,22 +65,21 @@ class ExchangeService:
         rate: float,
     ) -> None:
         async with scoped_transaction():
-            async with scoped_transaction():
-                user = await self.user_repository.get(tg_id=tg_id, with_for_update=True)
+            user = await self.user_repository.get(tg_id=tg_id, with_for_update=True)
 
-                buy_amount = amount * rate
-                if user.balances[to_currency.name] < buy_amount:
-                    raise InsufficientFundsError
+            buy_amount = amount * rate
+            if user.balances[to_currency.name] < buy_amount:
+                raise InsufficientFundsError
 
-                received_amount = await self.exchange_api.buy(
-                    amount, from_currency, to_currency
-                )
-                user.balances[from_currency.name] += amount
-                user.balances[to_currency.name] -= received_amount
-                await self.user_repository.update_balances(user.id, user.balances)
-                await self.transaction_repository.update_status(
-                    transaction.id, enums_transaction.TransactionStatus.COMPLETED
-                )
+            received_amount = await self.exchange_api.buy(
+                amount, from_currency, to_currency
+            )
+            user.balances[from_currency.name] += amount
+            user.balances[to_currency.name] -= received_amount
+            await self.user_repository.update_balances(user.id, user.balances)
+            await self.transaction_repository.update_status(
+                transaction.id, enums_transaction.TransactionStatus.COMPLETED
+            )
 
     async def process_exchange(
         self,
@@ -104,26 +103,20 @@ class ExchangeService:
             )
             await self.transaction_repository.create(transaction)
 
-        if operation_type is enums.ExchangeOperationType.SELL:
-            try:
+        try:
+            if operation_type is enums.ExchangeOperationType.SELL:
                 await self._process_sell(
                     tg_id, amount, from_currency, to_currency, transaction
                 )
-            except ExchangeAPIError:
-                async with scoped_transaction():
-                    await self.transaction_repository.update_status(
-                        transaction.id, enums_transaction.TransactionStatus.REJECTED
-                    )
-                raise ExchangeFailed
-        else:
-            # Обработка покупки
-            try:
+
+            else:
+                # Обработка покупки
                 await self._process_buy(
                     tg_id, amount, from_currency, to_currency, transaction, rate
                 )
-            except ExchangeAPIError:
-                async with scoped_transaction():
-                    await self.transaction_repository.update_status(
-                        transaction.id, enums_transaction.TransactionStatus.REJECTED
-                    )
-                raise ExchangeFailed
+        except ExchangeAPIError:
+            async with scoped_transaction():
+                await self.transaction_repository.update_status(
+                    transaction.id, enums_transaction.TransactionStatus.REJECTED
+                )
+            raise ExchangeFailed
