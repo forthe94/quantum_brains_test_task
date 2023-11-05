@@ -12,17 +12,25 @@ class UserReportService:
         self.transaction_repository = TransactionRepository()
         self.rates_client = rates_client
 
-    async def _count_pnl(self, user: User, currency: enums.CryptoCurrencies = enums.CryptoCurrencies.BTC) -> float:
+    async def _count_pnl(
+        self, user: User, currency: enums.CryptoCurrencies = enums.CryptoCurrencies.BTC
+    ) -> float:
         user_pnl = UserPNL()
         async with scoped_transaction():
-            async for trans in self.transaction_repository.get_completed_transactions(user.id):
+            async for trans in self.transaction_repository.get_completed_transactions(
+                user.id
+            ):
                 if trans.operation_type == enums.ExchangeOperationType.SELL:
                     user_pnl.balances[trans.from_currency.name] -= trans.amount
-                    user_pnl.balances[trans.to_currency.name] += trans.amount * trans.rate
+                    user_pnl.balances[trans.to_currency.name] += (
+                        trans.amount * trans.rate
+                    )
                 else:
                     user_pnl.balances[trans.from_currency.name] += trans.amount
-                    user_pnl.balances[trans.to_currency.name] -= trans.amount * trans.rate
-        coins_to_convert = (coin for coin in  user_pnl.balances if coin != currency.name)
+                    user_pnl.balances[trans.to_currency.name] -= (
+                        trans.amount * trans.rate
+                    )
+        coins_to_convert = (coin for coin in user_pnl.balances if coin != currency.name)
         for coin in coins_to_convert:
             amount = user_pnl.balances[coin]
             rate = await self.rates_client.get_rates(coin, currency.name)
@@ -44,5 +52,5 @@ class UserReportService:
             ret += f"{coin_name}: {coin_val:.6f}\n"
         pnl_coin = enums.CryptoCurrencies.BTC
         pnl = await self._count_pnl(user, pnl_coin)
-        ret += f'PNL in {pnl_coin.name}: {pnl:.6f}'
+        ret += f"PNL in {pnl_coin.name}: {pnl:.6f}"
         return ret

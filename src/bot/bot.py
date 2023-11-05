@@ -65,6 +65,14 @@ async def report_handler(
     ans = await report_service.generate_report(message.from_user.id)
     await message.answer(ans)
 
+@dispatcher.message_handler()
+async def user_request_handler(
+    message: types.Message,
+) -> None:
+    user_service = UserService()
+    await user_service.add_user_request(message.from_user.id, message.text)
+    await message.answer("Ваше сообщение зарегистрированно, скоро мы вернёмся с ответом.")
+
 
 async def start_app() -> None:
     logger.info("Start app quantum brains exchange")

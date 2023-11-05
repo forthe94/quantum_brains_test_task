@@ -39,4 +39,3 @@ async def test_get_completed_transactions(
     async with scoped_transaction():
         async for db_trans in transaction_repo.get_completed_transactions(user.id):
             assert db_trans.amount == 5
-

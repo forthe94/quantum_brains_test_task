@@ -48,8 +48,7 @@ class TransactionRepository:
             TransactionORM.status == enums.TransactionStatus.COMPLETED,
         )
         result = await self.session.stream(
-            q,
-            execution_options={"yield_per": batch_size}
+            q, execution_options={"yield_per": batch_size}
         )
         async for row in result:
             orm = row[0]
@@ -62,5 +61,4 @@ class TransactionRepository:
                 rate=orm.rate,
                 status=orm.status,
                 id=orm.id,
-
             )

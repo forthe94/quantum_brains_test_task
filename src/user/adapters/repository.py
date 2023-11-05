@@ -4,7 +4,7 @@ import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_session, json_dumps
-from src.user.adapters.orm import UserORM
+from src.user.adapters.orm import UserORM, UserRequestORM
 from src.user.domain.model import User
 
 
@@ -41,6 +41,20 @@ class UserRepository:
             sa.update(UserORM)
             .where(UserORM.id == user_id)
             .values(balances=balances_str)
+        )
+
+        await self.session.execute(q)
+
+
+class UserRequestRepository:
+    @property
+    def session(self) -> AsyncSession:
+        return get_session()
+
+    async def create(self, user_id: uuid.UUID, text: str) -> None:
+        q = sa.insert(UserRequestORM).values(
+            user_id=user_id,
+            text=text,
         )
 
         await self.session.execute(q)
