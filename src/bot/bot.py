@@ -7,11 +7,8 @@ from loguru import logger
 from src import config
 from src.database import scoped_transaction
 from src.exchange import enums
-from src.exchange.services.exchange import (
-    ExchangeService,
-    ExchangeFailed,
-    InsufficientFundsError,
-)
+from src.exchange.services.exchange import (ExchangeFailed, ExchangeService,
+                                            InsufficientFundsError)
 from src.user.services.report_service import UserReportService
 from src.user.services.user import UserService
 
@@ -24,11 +21,14 @@ async def entry_point(
     message: types.Message,
 ) -> None:
     user_service = UserService()
-    with open(config.PROJECT_ROOT / 'files' / 'initial_balances.json') as f:
+    with open(config.PROJECT_ROOT / "files" / "initial_balances.json") as f:
         initial_balances = json.load(f)
     async with scoped_transaction():
         await user_service.create_new_user(
-            message.from_user.id, balances=defaultdict(float, initial_balances.get(str(message.from_user.id)) or {})
+            message.from_user.id,
+            balances=defaultdict(
+                float, initial_balances.get(str(message.from_user.id)) or {}
+            ),
         )
 
 

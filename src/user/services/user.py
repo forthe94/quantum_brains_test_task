@@ -11,7 +11,7 @@ class UserService:
         self.user_request_repository = UserRequestRepository()
 
     async def create_new_user(
-        self, tg_id: int, balances=defaultdict(float, {})
+        self, tg_id: int, balances: defaultdict[str, float] = defaultdict(float, {})
     ) -> None:
         user = User(tg_id=tg_id, balances=balances)
         await self.user_repository.create(user)

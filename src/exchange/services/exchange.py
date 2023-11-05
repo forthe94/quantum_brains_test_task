@@ -1,8 +1,6 @@
-import uuid
-
 from src.database import scoped_transaction
 from src.exchange import enums
-from src.exchange.adapters.exchange_api import exchange_api, ExchangeAPIError
+from src.exchange.adapters.exchange_api import ExchangeAPIError, exchange_api
 from src.exchange.adapters.rates_client import rates_client
 from src.transaction import enums as enums_transaction
 from src.transaction.adapters.repository import TransactionRepository

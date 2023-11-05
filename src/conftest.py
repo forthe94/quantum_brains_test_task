@@ -33,6 +33,7 @@ async def rates_service_mock(mocker):
         f"src.exchange.adapters.rates_client.RatesClient.get_rates", return_value=2.0
     )
 
+
 @pytest_asyncio.fixture
 async def exchange_api_mock(mocker):
     mocker.patch(
