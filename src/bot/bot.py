@@ -1,12 +1,13 @@
 from collections import defaultdict
 
-from aiogram import Bot, Dispatcher, types, filters
+from aiogram import Bot, Dispatcher, filters, types
 from loguru import logger
 
 from src import config
 from src.database import scoped_transaction
 from src.exchange import enums
 from src.exchange.services.exchange import ExchangeService
+from src.user.services.report_service import UserReportService
 from src.user.services.user import UserService
 
 bot = Bot(token=config.BOT_TOKEN)
@@ -19,7 +20,9 @@ async def entry_point(
 ) -> None:
     user_service = UserService()
     async with scoped_transaction():
-        await user_service.create_new_user(message.from_user.id, balances=defaultdict(float, {"BTC": 100}))
+        await user_service.create_new_user(
+            message.from_user.id, balances=defaultdict(float, {"BTC": 100})
+        )
 
 
 def parse_exchange_message(
@@ -51,6 +54,16 @@ async def exchange_handler(
         message.from_user.id, op, amount, from_cur, to_cur
     )
     await message.answer("Exchange successful!")
+
+
+@dispatcher.message_handler(filters.Text(equals="report"))
+async def exchange_handler(
+    message: types.Message,
+) -> None:
+    report_service = UserReportService()
+
+    ans = await report_service.generate_report(message.from_user.id)
+    await message.answer(ans)
 
 
 async def start_app() -> None:

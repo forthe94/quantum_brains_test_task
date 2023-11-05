@@ -1,9 +1,10 @@
 import json
 import uuid
+from collections import defaultdict
 
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import UUID
-from collections import defaultdict
+
 from src.database import AppORM
 from src.user.domain.model import User
 

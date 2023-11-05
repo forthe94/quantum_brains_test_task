@@ -2,9 +2,10 @@ import uuid
 
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import UUID
-from src.transaction import enums as enums_transaction
+
 from src.database import AppORM
 from src.exchange import enums
+from src.transaction import enums as enums_transaction
 
 
 class TransactionORM(AppORM):
@@ -17,3 +18,4 @@ class TransactionORM(AppORM):
     from_currency = sa.Column(sa.Enum(enums.CryptoCurrencies))
     to_currency = sa.Column(sa.Enum(enums.CryptoCurrencies))
     rate = sa.Column(sa.Float, nullable=False)
+    amount = sa.Column(sa.Float, nullable=False)

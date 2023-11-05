@@ -9,4 +9,4 @@ class User:
     balances: defaultdict[str, float] = dataclasses.field(
         default_factory=lambda: defaultdict(float)
     )
-    id: uuid.UUID = uuid.uuid4()
+    id: uuid.UUID = dataclasses.field(default_factory=uuid.uuid4)

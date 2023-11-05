@@ -1,11 +1,11 @@
 import uuid
 
 import sqlalchemy as sa
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_session, json_dumps
 from src.user.adapters.orm import UserORM
 from src.user.domain.model import User
-from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class UserRepository:

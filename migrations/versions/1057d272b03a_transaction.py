@@ -1,18 +1,17 @@
 """transaction
 
-Revision ID: 4142eaa58d4c
+Revision ID: 1057d272b03a
 Revises: ab652a1eb17e
-Create Date: 2023-11-03 15:58:13.253939
+Create Date: 2023-11-05 09:53:06.005124
 
 """
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "4142eaa58d4c"
+revision: str = "1057d272b03a"
 down_revision: Union[str, None] = "ab652a1eb17e"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -45,6 +44,7 @@ def upgrade() -> None:
             nullable=True,
         ),
         sa.Column("rate", sa.Float(), nullable=False),
+        sa.Column("amount", sa.Float(), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
         sa.ForeignKeyConstraint(

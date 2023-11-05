@@ -1,7 +1,8 @@
 import asyncio
 
-import pytest_asyncio
 import pytest
+import pytest_asyncio
+
 from src.database import METADATA, scoped_async_session, scoped_transaction
 
 

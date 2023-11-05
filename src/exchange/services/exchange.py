@@ -1,11 +1,13 @@
+import uuid
+
 from src.database import scoped_transaction
-from src.exchange.adapters.rates_client import rates_client
+from src.exchange import enums
 from src.exchange.adapters.exchange_api import exchange_api
+from src.exchange.adapters.rates_client import rates_client
+from src.transaction import enums as enums_transaction
 from src.transaction.adapters.repository import TransactionRepository
 from src.transaction.domain.model import Transaction
 from src.user.adapters.repository import UserRepository
-from src.exchange import enums
-from src.transaction import enums as enums_transaction
 
 
 class ExchangeError(Exception):
@@ -37,6 +39,7 @@ class ExchangeService:
             user = await self.user_repository.get(tg_id=tg_id)
             transaction = Transaction(
                 user_id=user.id,
+                amount=amount,
                 operation_type=operation_type,
                 from_currency=from_currency,
                 to_currency=to_currency,

@@ -1,20 +1,15 @@
+import datetime as dt
 import enum
 import json
 import uuid
+from contextvars import ContextVar
+from functools import partial, wraps
 from typing import Any
 
 import sqlalchemy as sa
-import datetime as dt
-from contextvars import ContextVar
-from functools import wraps, partial
-
 from loguru import logger
-from sqlalchemy.ext.asyncio import (
-    AsyncSession,
-    async_scoped_session,
-    async_sessionmaker,
-    create_async_engine,
-)
+from sqlalchemy.ext.asyncio import (AsyncSession, async_scoped_session,
+                                    async_sessionmaker, create_async_engine)
 from sqlalchemy.orm import as_declarative
 
 from src import config

@@ -1,14 +1,15 @@
 import json
 from collections import defaultdict
 
+import pytest
+import sqlalchemy as sa
+
 from src.database import scoped_transaction
 from src.exchange import enums
 from src.exchange.services.exchange import ExchangeService
 from src.user.adapters.orm import UserORM
 from src.user.adapters.repository import UserRepository
 from src.user.domain.model import User
-import pytest
-import sqlalchemy as sa
 
 pytestmark = pytest.mark.asyncio
 
