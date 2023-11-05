@@ -1,3 +1,5 @@
+import asyncio
+
 from src.database import scoped_transaction
 from src.exchange import enums
 from src.exchange.adapters.rates_client import rates_client
@@ -11,6 +13,19 @@ class UserReportService:
         self.user_repository = UserRepository()
         self.transaction_repository = TransactionRepository()
         self.rates_client = rates_client
+
+    async def __process_coin(
+        self, user_pnl: UserPNL, coin: str, currency: enums.CryptoCurrencies
+    ) -> None:
+        amount = user_pnl.balances[coin]
+        rate = await self.rates_client.get_rates(coin, currency.name)
+        if amount > 0:
+            # Если больше нуля надо продать
+            user_pnl.balances[coin] -= amount
+            user_pnl.balances[currency.name] += amount * rate
+        else:
+            user_pnl.balances[coin] += amount
+            user_pnl.balances[currency.name] -= amount * rate
 
     async def _count_pnl(
         self, user: User, currency: enums.CryptoCurrencies = enums.CryptoCurrencies.BTC
@@ -31,16 +46,10 @@ class UserReportService:
                         trans.amount * trans.rate
                     )
         coins_to_convert = (coin for coin in user_pnl.balances if coin != currency.name)
+        tasks = []
         for coin in coins_to_convert:
-            amount = user_pnl.balances[coin]
-            rate = await self.rates_client.get_rates(coin, currency.name)
-            if amount > 0:
-                # Если больше нуля надо продать
-                user_pnl.balances[coin] -= amount
-                user_pnl.balances[currency.name] += amount * rate
-            else:
-                user_pnl.balances[coin] += amount
-                user_pnl.balances[currency.name] -= amount * rate
+            tasks.append(self.__process_coin(user_pnl, coin, currency))
+        await asyncio.gather(*tasks)
         return user_pnl.balances[currency.name]
 
     async def generate_report(self, user_tg_id: int) -> str:
