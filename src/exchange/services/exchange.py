@@ -34,7 +34,7 @@ class ExchangeService:
         from_currency: enums.CryptoCurrencies,
         to_currency: enums.CryptoCurrencies,
         transaction: Transaction,
-    ) -> None:
+    ) -> float:
         async with scoped_transaction():
             user = await self.user_repository.get(tg_id=tg_id, with_for_update=True)
             # обработка продажи
@@ -42,16 +42,17 @@ class ExchangeService:
             if user.balances[from_currency.name] < amount:
                 raise InsufficientFundsError
 
-            received_amount = await self.exchange_api.sell(
+            rate = await self.exchange_api.sell(
                 amount, from_currency, to_currency
             )
 
             user.balances[from_currency.name] -= amount
-            user.balances[to_currency.name] += received_amount
+            user.balances[to_currency.name] += rate * amount
             await self.user_repository.update_balances(user.id, user.balances)
             await self.transaction_repository.update_status(
                 transaction.id, enums_transaction.TransactionStatus.COMPLETED
             )
+            return rate
 
     async def _process_buy(
         self,
@@ -61,7 +62,7 @@ class ExchangeService:
         to_currency: enums.CryptoCurrencies,
         transaction: Transaction,
         rate: float,
-    ) -> None:
+    ) -> float:
         async with scoped_transaction():
             user = await self.user_repository.get(tg_id=tg_id, with_for_update=True)
 
@@ -69,15 +70,16 @@ class ExchangeService:
             if user.balances[to_currency.name] < buy_amount:
                 raise InsufficientFundsError
 
-            received_amount = await self.exchange_api.buy(
+            rate = await self.exchange_api.buy(
                 amount, from_currency, to_currency
             )
             user.balances[from_currency.name] += amount
-            user.balances[to_currency.name] -= received_amount
+            user.balances[to_currency.name] -= rate * amount
             await self.user_repository.update_balances(user.id, user.balances)
             await self.transaction_repository.update_status(
                 transaction.id, enums_transaction.TransactionStatus.COMPLETED
             )
+            return rate
 
     async def process_exchange(
         self,
@@ -86,7 +88,7 @@ class ExchangeService:
         amount: float,
         from_currency: enums.CryptoCurrencies,
         to_currency: enums.CryptoCurrencies,
-    ) -> None:
+    ) -> float:
         rate = await self.rates_client.get_rates(from_currency.name, to_currency.name)
 
         async with scoped_transaction():
@@ -103,13 +105,13 @@ class ExchangeService:
 
         try:
             if operation_type is enums.ExchangeOperationType.SELL:
-                await self._process_sell(
+                rate = await self._process_sell(
                     tg_id, amount, from_currency, to_currency, transaction
                 )
 
             else:
                 # Обработка покупки
-                await self._process_buy(
+                rate = await self._process_buy(
                     tg_id, amount, from_currency, to_currency, transaction, rate
                 )
         except ExchangeAPIError:
@@ -118,3 +120,4 @@ class ExchangeService:
                     transaction.id, enums_transaction.TransactionStatus.REJECTED
                 )
             raise ExchangeFailed
+        return rate

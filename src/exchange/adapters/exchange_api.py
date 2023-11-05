@@ -20,7 +20,7 @@ class ExchangeApi:
         if random.randint(0, 9) == 1:
             raise ExchangeAPIError
         rate = await rates_client.get_rates(from_currency.name, to_currency.name)
-        return rate * amount
+        return rate
 
     async def buy(
         self,
@@ -34,7 +34,7 @@ class ExchangeApi:
             raise ExchangeAPIError
 
         rate = await rates_client.get_rates(from_currency.name, to_currency.name)
-        return amount * rate
+        return rate
 
 
 exchange_api = ExchangeApi()

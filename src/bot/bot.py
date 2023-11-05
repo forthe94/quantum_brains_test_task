@@ -58,10 +58,15 @@ async def exchange_handler(
         return
 
     try:
-        await exchange_service.process_exchange(
+        rate = await exchange_service.process_exchange(
             message.from_user.id, op, amount, from_cur, to_cur
         )
-        ans = "Exchange successful!"
+        if op == enums.ExchangeOperationType.SELL:
+            ans = f"Exchange successful!\nSold {amount:.6f} {from_cur.name} at rate {rate}\n"
+            ans += f"Received {amount*rate:.6f} {to_cur.name}."
+        else:
+            ans = f"Exchange successful!\nBought {amount:.6f} {from_cur.name} at rate {rate}\n"
+            ans += f"Spend {amount*rate:.6f} {to_cur.name}."
     except ExchangeFailed:
         ans = "Exchange failed, please try again"
     except InsufficientFundsError:
