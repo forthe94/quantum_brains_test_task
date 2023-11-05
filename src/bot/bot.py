@@ -57,7 +57,7 @@ async def exchange_handler(
 
 
 @dispatcher.message_handler(filters.Text(equals="report"))
-async def exchange_handler(
+async def report_handler(
     message: types.Message,
 ) -> None:
     report_service = UserReportService()

@@ -10,3 +10,10 @@ class User:
         default_factory=lambda: defaultdict(float)
     )
     id: uuid.UUID = dataclasses.field(default_factory=uuid.uuid4)
+
+
+@dataclasses.dataclass
+class UserPNL:
+    balances: defaultdict[str, float] = dataclasses.field(
+        default_factory=lambda: defaultdict(float)
+    )

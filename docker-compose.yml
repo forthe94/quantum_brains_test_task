@@ -9,3 +9,4 @@ services:
         POSTGRES_DB: "quantum_brains"
         POSTGRES_USER: "quantum_brains"
         POSTGRES_PASSWORD: "quantum_brains"
+
